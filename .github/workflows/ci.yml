@@ -48,16 +48,16 @@ jobs:
         with:
           serverHostname: ${{ secrets.DT_SERVER_HOST }}
           apiKey: ${{ secrets.DT_API_KEY }}
-          projectName: ${{ github.repository }}  # Автоматически имя репозитория
+          projectName: ${{ github.repository }}
           projectVersion: ${{ github.ref_name }}
-          bomFilename: build/reports/bom.json    # Точный путь по конфигурации
+          bomFilename: build/reports/cyclonedx/application.cdx.json
           autoCreate: true
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
         with:
           name: sbom
-          path: build/reports/  # Включает bom.json
+          path: build/reports/cyclonedx/
           retention-days: 7
 
   security:
