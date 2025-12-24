@@ -43,9 +43,3 @@ dependencyCheck {
     autoUpdate = false
     scanConfigurations = ['implementation', 'runtimeClasspath']
 }
-
-cyclonedxBom {
-    includeConfigs = [configurations.runtimeClasspath]
-    outputName = 'bom'
-    outputFormat = 'json'
-}
