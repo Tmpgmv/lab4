@@ -44,7 +44,7 @@ dependencyCheck {
     scanConfigurations = ['implementation', 'runtimeClasspath']
 }
 
-cyclonedxBom {  // ← ДОБАВЬ ЭТО
+cyclonedxBom {
     verbose = true
     includeConfigs = [configurations.runtimeClasspath]
     outputName = 'bom'

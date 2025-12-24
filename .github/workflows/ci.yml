@@ -44,7 +44,7 @@ jobs:
           apiKey: ${{ secrets.DT_API_KEY }}
           projectName: 'my-java-project'                  # можно заменить на ${{ github.repository }}
           projectVersion: ${{ github.head_ref || github.ref_name }}
-          bomFilename: 'build/reports/cyclonedx/bom.xml'
+          bomFilename: build/reports/bom.json
           autoCreate: true
 
       # Сохранить SBOM как артефакт на 7 дней
