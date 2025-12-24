@@ -34,6 +34,15 @@ jobs:
       - name: Generate SBOM
         run: ./gradlew cyclonedxBom  # Только cyclonedxBom!
 
+      - name: Debug SBOM files
+        run: |
+          echo "=== build/reports/ contents ==="
+          ls -la build/reports/ || echo "reports/ not found"
+          echo "=== build/ contents ==="
+          find build/ -name "*.json" -o -name "*.xml" | head -10 || echo "No BOM files found"
+          echo "=== cyclonedxBom output ==="
+          ./gradlew cyclonedxBom --dry-run
+
       - name: Upload SBOM to Dependency-Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
