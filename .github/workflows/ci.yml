@@ -1,6 +1,8 @@
 name: CI Security
 
 on:
+  push:          # ← Добавлено: запускается при push
+    branches: [main]  # ← Только в main
   pull_request:
     types: [opened, synchronize, reopened]
 
