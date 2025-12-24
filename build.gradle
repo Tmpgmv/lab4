@@ -44,4 +44,9 @@ dependencyCheck {
     scanConfigurations = ['implementation', 'runtimeClasspath']
 }
 
-// Disable problematic analyzers via system properties in gradle.properties instead
+cyclonedxBom {  // ← ДОБАВЬ ЭТО
+    verbose = true
+    includeConfigs = [configurations.runtimeClasspath]
+    outputName = 'bom'
+    outputFormat = 'json'
+}
