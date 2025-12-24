@@ -1,8 +1,8 @@
 name: CI Security
 
 on:
-  push:          # ← Добавлено: запускается при push
-    branches: [main]  # ← Только в main
+  push:
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -31,28 +31,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Генерация SBOM (CycloneDX Gradle plugin)
       - name: Generate SBOM
-        run: ./gradlew clean build cyclonedxBom
-        # по умолчанию bom: build/reports/cyclonedx/bom.xml [web:26]
+        run: ./gradlew cyclonedxBom  # Только cyclonedxBom!
 
-      # Загрузка SBOM в Dependency-Track
       - name: Upload SBOM to Dependency-Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
-          serverHostname: ${{ secrets.DT_SERVER_HOST }}   # например: deptrack.example.com [web:25][web:28]
+          serverHostname: ${{ secrets.DT_SERVER_HOST }}
           apiKey: ${{ secrets.DT_API_KEY }}
-          projectName: 'my-java-project'                  # можно заменить на ${{ github.repository }}
-          projectVersion: ${{ github.head_ref || github.ref_name }}
-          bomFilename: build/reports/bom.json
+          projectName: ${{ github.repository }}  # Автоматически имя репозитория
+          projectVersion: ${{ github.ref_name }}
+          bomFilename: build/reports/bom.json    # Точный путь по конфигурации
           autoCreate: true
 
-      # Сохранить SBOM как артефакт на 7 дней
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
         with:
           name: sbom
-          path: build/reports/cyclonedx/
+          path: build/reports/  # Включает bom.json
           retention-days: 7
 
   security:
@@ -76,19 +72,3 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      # Запуск OWASP Dependency Check через Gradle‑плагин
-      - name: Run OWASP Dependency Check
-        run: ./gradlew dependencyCheckAnalyze
-        # предполагается, что подключён Gradle‑плагин org.owasp.dependencycheck, отчёты в build/reports/dependency-check [conversation_history:10][conversation_history:18]
-
-      # Сохранить отчёт Dependency Check как артефакт на 7 дней
-      - name: Upload Dependency Check report
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-check-report
-          path: build/reports/dependency-check/
-          retention-days: 7

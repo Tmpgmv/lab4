@@ -45,7 +45,6 @@ dependencyCheck {
 }
 
 cyclonedxBom {
-    verbose = true
     includeConfigs = [configurations.runtimeClasspath]
     outputName = 'bom'
     outputFormat = 'json'
