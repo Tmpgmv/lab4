@@ -7,7 +7,8 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: read  # Required for dependency-review-action
+  contents: read
+  security-events: write  # For SARIF uploads
 
 jobs:
   build:
@@ -36,15 +37,6 @@ jobs:
       - name: Generate SBOM
         run: ./gradlew cyclonedxBom
 
-      - name: Debug SBOM files
-        run: |
-          echo "=== build/reports/ contents ==="
-          ls -la build/reports/ || echo "reports/ not found"
-          echo "=== build/ contents ==="
-          find build/ -name "*.json" -o -name "*.xml" | head -10 || echo "No BOM files found"
-          echo "=== cyclonedxBom output ==="
-          ./gradlew cyclonedxBom --dry-run
-
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
         with:
@@ -62,22 +54,22 @@ jobs:
 
       - name: Dependency Review (GitHub Native)
         if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v4  # Correct version [web:35]
+        uses: actions/dependency-review-action@v4
 
-      - name: OWASP Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@v3  # Correct version
+      - name: 'OWASP Dependency-Check'
+        uses: dependency-check/Dependency-Check_Action@main  # Correct reference [web:42]
         with:
           project: '${{ github.repository }}'
           path: '.'
           format: 'HTML'
+          out: 'build/reports/'  # Match your Gradle output structure
           args: >-
-            --scan ./ 
-            --format HTML 
-            --out build/reports/
             --noupdate
+            --scan ./
 
       - name: Upload Dependency-Check Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: dependency-check-html
-          path: build/reports/dependency-check-report.html
+          name: dependency-check-report
+          path: build/reports/
