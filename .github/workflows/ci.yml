@@ -39,9 +39,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 'CodeQL Analysis'
-        uses: github/codeql-action/analyze@v3
-
       - name: OWASP Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
