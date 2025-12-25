@@ -6,6 +6,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+permissions:
+  contents: read  # Required for dependency-review-action
+
 jobs:
   build:
     name: Build & SBOM
@@ -59,28 +62,22 @@ jobs:
 
       - name: Dependency Review (GitHub Native)
         if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v5  # Scans PRs for vulns/licenses [web:29]
+        uses: actions/dependency-review-action@v4  # Correct version [web:35]
 
       - name: OWASP Dependency-Check
-        uses: dependency-check/Dependency-Check_Action@v4
+        uses: dependency-check/Dependency-Check_Action@v3  # Correct version
         with:
           project: '${{ github.repository }}'
           path: '.'
-          format: 'HTML SARIF'
+          format: 'HTML'
           args: >-
             --scan ./ 
             --format HTML 
-            --format SARIF 
-            --out build/reports/dependency-check-report.html
+            --out build/reports/
             --noupdate
 
-      - name: Upload Dependency-Check HTML
+      - name: Upload Dependency-Check Report
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-html
           path: build/reports/dependency-check-report.html
-
-      - name: Upload SARIF (GitHub CodeQL compatible)
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: build/reports/dependency-check-report.sarif
